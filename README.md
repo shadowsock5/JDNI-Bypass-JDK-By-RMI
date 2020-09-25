@@ -1,4 +1,10 @@
-# JDNI-Bypass-JDK-By-RMI
+# 参考
+- [marshalsec启动的普通RMI服务器](https://github.com/mbechler/marshalsec/blob/master/src/main/java/marshalsec/jndi/RMIRefServer.java#L299)
+- [自己写的普通的RMI服务器](https://github.com/shadowsock5/JDNI-Bypass-JDK-By-RMI/blob/master/NormalRMIServer.java)
+- [绕过的基于Tomcat的RMI服务器](https://github.com/shadowsock5/JDNI-Bypass-JDK-By-RMI/blob/master/TomcatRMIServer.java)
+
+
+# JDNI-Bypass-JDK8u121-By-RMI
 
 ```bash
 javac -cp  "D:\repos\apache-tomcat-8.5.53\lib\catalina.jar" .\TomcatRMIServer.java
