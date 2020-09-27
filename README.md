@@ -137,8 +137,49 @@ ObjectFactory factory = getObjectFactoryFromReference(ref, f);
 // 最后调用这个
 factory.getObjectInstance(ref, name, nameCtx, environment);
 ```
-												
+
+#### javax.naming.spi.NamingManager#getObjectFactoryFromReference
+```java
+    static ObjectFactory getObjectFactoryFromReference(
+        Reference ref, String factoryName)
+        throws IllegalAccessException,
+        InstantiationException,
+        MalformedURLException {
+        Class<?> clas = null;
+
+        // Try to use current class loader
+        try {
+             clas = helper.loadClass(factoryName);    // 尝试用本地的TomcatEmbeddedWebappClassLoader加载factory类org.apache.naming.factory.BeanFactory
+        } catch (ClassNotFoundException e) {
+            // ignore and continue
+            // e.printStackTrace();
+        }
+        // All other exceptions are passed up.
+
+        // Not in class path; try to use codebase
+        String codebase;
+        if (clas == null &&
+                (codebase = ref.getFactoryClassLocation()) != null) {   // 若本地未找到，才会尝试从factoryLocation（url）里远程加载
+            try {
+                clas = helper.loadClass(factoryName, codebase);
+            } catch (ClassNotFoundException e) {
+            }
+        }
+
+        return (clas != null) ? (ObjectFactory) clas.newInstance() : null;    // 最后调用这个factory类的无参构造器构造出一个实例
+    }
+```
+
 ### => org.apache.naming.factory.BeanFactory#getObjectInstance
+开始就进行参数的类型判断，
+```java
+if (obj instanceof ResourceRef){
+    ...
+}else{
+    return null;
+}
+```
+只有传入的参数是`ResourceRef`类型，才会进入后续的...
 ```java
 String beanClassName = ref.getClassName();    // 拿到class的名字，这里是javax.el.ELProcessor
 
