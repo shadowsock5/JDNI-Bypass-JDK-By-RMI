@@ -227,3 +227,7 @@ if (method != null) {
     method.invoke(bean, valueArray);
     
 ```
+
+### 总结
+- jdk8u121之前的rmi的jndi注入情况下，只需要RMI服务器构造一个Reference，然后把相关的factoryName和factoryLocation（存放class文件的地方http,ftp等）bind到Registry，然后等rmi客户端调用lookup这个jndi的url时，即可将这个Reference传给客户端，然后直接加载factoryLocation中的类，完成指定类的静态方法中的任意代码执行。
+- jdk8u121之后的rmi的jndi注入绕过方式，与之前不同由于加载Reference之后，会判断factoryLocation是否存在，如果用之前的方式，因为要指定class加载的远程地址，所以必须传这个factoryLocation，但是jdk8u121之后的`com\sun\jndi\rmi\registry\RegistryContext.class#decodeObject`中在进行加载远程类之前，先进行了三个条件的判断，其中第一、三个条件是固定的，只能用第二个条件即factoryLocation找切入点。这个条件也不难满足，设置成null倒是简单，但是从那里找class加载呢？最后构造的poc中将factoryLocation设置为null（不从远程加载class了），将目标转向目标环境的本地classpath中可能存在的类，这个类必须满足是`ObjectFactory`类型，而且根据jdk中的逻辑，会调用其`getObjectInstance`方法（到时候可以在这里做文章），于是找到Tomcat8+的org.apache.naming.factory.BeanFactory作为factoryName，然后由于org.apache.naming.factory.BeanFactory中特定的逻辑，需要找到一个具有无参构造器的类beanClass，而且可以在它的`接收一个String类型参数的方法`中实现RCE。最后找到这个类可以是`javax.el.ELProcessor`，而且它刚好在Tomcat中，没有更多的gadget依赖，在其eval(String)方法中即可传入任意代码造成RCE。随后又有orange找到了`groovy.lang.GroovyClassLoader`这个beanClass，不过需要有groovy依赖，然后在其`parseClass(String text)`方法中实现RCE。
