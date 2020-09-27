@@ -180,6 +180,7 @@ if (obj instanceof ResourceRef){
 }
 ```
 只有传入的参数是`ResourceRef`类型，才会进入后续的...
+所以恶意RMI服务器不能用普通的`Reference`，而必须用`ResourceRef`类型。
 ```java
 String beanClassName = ref.getClassName();    // 拿到class的名字，这里是javax.el.ELProcessor
 
