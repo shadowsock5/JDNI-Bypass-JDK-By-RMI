@@ -227,6 +227,7 @@ if (method != null) {
     method.invoke(bean, valueArray);
     
 ```
+IDEA反编译的代码有一些问题，可以参考源码：https://github.com/apache/tomcat/blob/8.5.28/java/org/apache/naming/factory/BeanFactory.java
 
 ### 总结
 - jdk8u121之前的rmi的jndi注入情况下，只需要RMI服务器构造一个Reference，然后把相关的factoryName和factoryLocation（存放class文件的地方http,ftp等）bind到Registry，然后等rmi客户端调用lookup这个jndi的url时，即可将这个Reference传给客户端，然后直接加载factoryLocation中的类，完成指定类的静态方法中的任意代码执行。
